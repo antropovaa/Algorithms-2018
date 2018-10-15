@@ -1,6 +1,7 @@
 package lesson1;
 
-import kotlin.NotImplementedError;
+import java.io.*;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaTasks {
@@ -31,9 +32,33 @@ public class JavaTasks {
      * 19:56:14
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
+     *
+     * Трудоемкость: T = O()
+     * Ресурсоемкость: R = O()
      */
     static public void sortTimes(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            Scanner input = new Scanner(new File(inputName));
+            ArrayList<String> sortedTimes = new ArrayList<>();
+            while (input.hasNextLine()) {
+                String line = input.nextLine();
+                if (line.matches("^(([0-1]\\d)|(2[0-3])):[0-5]\\d:[0-5]\\d\n?$")) {
+                    sortedTimes.add(line);
+                }
+                else throw new IllegalArgumentException("Incorrect time format.");
+            }
+            input.close();
+
+            Collections.sort(sortedTimes);
+
+            FileWriter output = new FileWriter(new File(outputName));
+            for (String time : sortedTimes) {
+                output.write(time + "\n");
+            }
+            output.close();
+        } catch (IOException e) {
+            System.out.println("File is not found.");
+        }
     }
 
     /**
@@ -61,9 +86,55 @@ public class JavaTasks {
      * Садовая 5 - Сидоров Петр, Сидорова Мария
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
+     *
+     * Трудоемкость: T = O()
+     * Ресурсоемкость: R = O()
      */
     static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            Scanner input = new Scanner(new File(inputName));
+            TreeMap<String, String> oldLines = new TreeMap<>();
+
+            while (input.hasNextLine()) {
+                String line = input.nextLine();
+                if (line.matches("^[А-я]+ [А-я]+ - [А-я]+ \\d+$")) {
+                    String[] addresses = line.split(" - ");
+                    oldLines.put(addresses[0], addresses[1]);
+                }
+            }
+            input.close();
+
+            TreeMap<String, TreeSet<String>> newLines = new TreeMap<>();
+            for (int i = 0; i < oldLines.size(); i++) {
+                String name = oldLines.keySet().toArray()[i].toString();
+                String address = oldLines.get(name);
+
+                if (!newLines.containsKey(address)) {
+                    TreeSet<String> names = new TreeSet<>();
+                    names.add(name);
+                    newLines.put(address, names);
+                }
+                else
+                    newLines.get(address).add(name);
+            }
+
+            FileWriter output = new FileWriter(new File(outputName));
+            for (String key : newLines.keySet()) {
+                StringBuilder namesLine = new StringBuilder();
+                TreeSet<String> namesSet = newLines.get(key);
+
+                if (namesSet.size() > 1) {
+                    for (int i = 0; i < namesSet.size() - 1; i++) {
+                        namesLine.append(namesSet.toArray()[i]).append(", ");
+                    }
+                }
+                namesLine.append(namesSet.toArray()[namesSet.size() - 1]);
+                output.write(key + " - " + namesLine + "\n");
+            }
+            output.close();
+        } catch (IOException e) {
+            System.out.println("File is not found.");
+        }
     }
 
     /**
@@ -95,9 +166,33 @@ public class JavaTasks {
      * 24.7
      * 99.5
      * 121.3
+     *
+     * Трудоекость: T = O()
+     * Ресурсоемкость: R = O()
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            Scanner input = new Scanner(new File(inputName));
+            ArrayList<Double> temperatures = new ArrayList<>();
+
+            while (input.hasNextLine()) {
+                String line = input.nextLine();
+                if (line.matches("^-?\\d+.\\d$")) {
+                    temperatures.add(Double.parseDouble(line));
+                }
+            }
+            input.close();
+
+            Collections.sort(temperatures);
+
+            FileWriter output = new FileWriter(new File(outputName));
+            for (double temp : temperatures) {
+                output.write(temp + "\n");
+            }
+            output.close();
+        } catch (IOException e) {
+            System.out.println("File is not found.");
+        }
     }
 
     /**
@@ -128,9 +223,59 @@ public class JavaTasks {
      * 2
      * 2
      * 2
+     *
+     * Трудоемкость: T = O()
+     * Ресурсоемкость: R = O()
      */
     static public void sortSequence(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try {
+            Scanner input = new Scanner(new File(inputName));
+            ArrayList<Integer> nums = new ArrayList<>();
+
+            while (input.hasNextInt()) {
+                int num = input.nextInt();
+                if (num > 0) {
+                    nums.add(num);
+                }
+            }
+
+            HashMap<Integer, Integer> statistic = new HashMap<>();
+            ArrayList<Integer> mostFrequentNums = new ArrayList<>();
+            int maxRepeats = 0;
+            for (Integer num : nums) {
+                int repeats = statistic.get(num) == null ? 1 : (statistic.get(num) + 1);
+                if (repeats == maxRepeats) {
+                    mostFrequentNums.add(num);
+                }
+                if (repeats > maxRepeats) {
+                    maxRepeats = repeats;
+                    mostFrequentNums.clear();
+                    mostFrequentNums.add(num);
+                }
+                statistic.put(num, repeats);
+            }
+
+            int minFrequentNum = mostFrequentNums.get(0);
+            for (int i = 1; i < mostFrequentNums.size(); i++) {
+                int num = nums.get(i);
+                if (mostFrequentNums.get(i) < minFrequentNum) {
+                    minFrequentNum = mostFrequentNums.get(i);
+                }
+            }
+
+            FileWriter output = new FileWriter(new File(outputName));
+            for (int num : nums) {
+                if (num != minFrequentNum) {
+                    output.write(num + "\n");
+                }
+            }
+            for (int i = 0; i < maxRepeats; i++) {
+                output.write(minFrequentNum + "\n");
+            }
+            output.close();
+        } catch (IOException e) {
+            System.out.println("File is not found.");
+        }
     }
 
     /**
@@ -146,8 +291,21 @@ public class JavaTasks {
      * second = [null null null null null 1 3 9 13 18 23]
      *
      * Результат: second = [1 3 4 9 9 13 15 20 23 28]
+     *
+     * Трудоемкость: T = O()
+     * Ресурсоемкость: R = O()
      */
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
-        throw new NotImplementedError();
+        int li = 0, ri = first.length;
+        int begin = 0; int end = second.length;
+        for (int i = begin; i < end; i++) {
+            if (li < first.length && (ri == second.length || first[li].compareTo(second[ri]) <= 0)) {
+                second[i] = first[li++];
+            }
+            else {
+                second[i] = second[ri++];
+            }
+        }
     }
 }
+
