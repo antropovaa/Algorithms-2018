@@ -1,9 +1,10 @@
 package lesson1
 
-import java.io.BufferedWriter
-import java.io.File
+import java.io.*
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.math.abs
+import kotlin.test.*
 
 abstract class AbstractTaskTests : AbstractFileTests() {
 
@@ -23,6 +24,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
         try {
             sortTimes("input/time_in2.txt", "temp.txt")
             assertFileContent("temp.txt",
@@ -33,16 +35,42 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
         try {
             sortTimes("input/time_in3.txt", "temp.txt")
             assertFileContent("temp.txt", File("input/time_out3.txt").readLines().joinToString(separator = "\n"))
         } finally {
             File("temp.txt").delete()
         }
+
+        try {
+            sortTimes("input/time_in4.txt", "temp.txt")
+            assertFileContent("temp.txt",
+                    """
+                        12:34:56
+                        12:34:56
+                        12:34:56
+                    """.trimIndent()
+            )
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            sortTimes("input/time_in5.txt", "temp.txt")
+            fail("IllegalArgumentException is expected.")
+
+        } catch (e: IllegalArgumentException) {
+        }
+
+        try {
+            sortTimes("input/time_in6.txt", "temp.txt")
+            fail("IOException is expected.")
+        } catch (e: IOException) {
+        }
     }
 
     protected fun sortAddresses(sortAddresses: (String, String) -> Unit) {
-        // TODO: large test
         try {
             sortAddresses("input/addr_in1.txt", "temp.txt")
             assertFileContent("temp.txt",
@@ -54,6 +82,25 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             )
         } finally {
             File("temp.txt").delete()
+        }
+
+        try {
+            sortAddresses("input/addr_in2.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/addr_out2.txt").readLines().joinToString(separator = "\n"))
+        } finally {
+            File("temp.txt").delete()
+        }
+
+        try {
+            sortAddresses("input/addr_in3.txt", "temp.txt")
+            fail("IllegalArgumentException is expected.")
+        } catch (e: IllegalArgumentException) {
+        }
+
+        try {
+            sortAddresses("input/addr_in4.txt", "temp.txt")
+            fail("IOException is expected.")
+        } catch (e: IOException) {
         }
     }
 
@@ -99,6 +146,18 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             File("temp.txt").delete()
         }
 
+        try {
+            sortTemperatures("input/temp_in2.txt", "temp.txt")
+            fail("IllegalArgumentException is expected.")
+        } catch (e: IllegalArgumentException) {
+        }
+
+        try {
+            sortTemperatures("input/temp_in3.txt", "temp.txt")
+            fail("IOException is expected.")
+        } catch (e: IOException) {
+        }
+
         fun testGeneratedTemperatures(size: Int) {
             try {
                 generateTemperatures(size)
@@ -133,6 +192,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
         try {
             sortSequence("input/seq_in2.txt", "temp.txt")
             assertFileContent("temp.txt",
@@ -149,6 +209,18 @@ abstract class AbstractTaskTests : AbstractFileTests() {
                     """.trimIndent())
         } finally {
             File("temp.txt").delete()
+        }
+
+        try {
+            sortSequence("input/seq_in3.txt", "temp.txt")
+            fail("IOException is expected.")
+        } catch (e: IOException) {
+        }
+
+        try {
+            sortSequence("input/seq_in4.txt", "temp.txt")
+            fail("IllegalArgumentException is expected.")
+        } catch (e: IllegalArgumentException) {
         }
 
         fun BufferedWriter.writeNumbers(numbers: List<Int>) {
