@@ -33,32 +33,27 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      *
-     * Трудоемкость: T = O()
-     * Ресурсоемкость: R = O()
+     * Трудоемкость: T = O(n)
+     * Ресурсоемкость: R = O(n)
      */
-    static public void sortTimes(String inputName, String outputName) {
-        try {
-            Scanner input = new Scanner(new File(inputName));
-            ArrayList<String> sortedTimes = new ArrayList<>();
-            while (input.hasNextLine()) {
-                String line = input.nextLine();
-                if (line.matches("^(([0-1]\\d)|(2[0-3])):[0-5]\\d:[0-5]\\d\n?$")) {
-                    sortedTimes.add(line);
-                }
-                else throw new IllegalArgumentException("Incorrect time format.");
-            }
-            input.close();
-
-            Collections.sort(sortedTimes);
-
-            FileWriter output = new FileWriter(new File(outputName));
-            for (String time : sortedTimes) {
-                output.write(time + "\n");
-            }
-            output.close();
-        } catch (IOException e) {
-            System.out.println("File is not found.");
+    static public void sortTimes(String inputName, String outputName) throws IOException {
+        Scanner input = new Scanner(new File(inputName));
+        List<String> sortedTimes = new ArrayList<>();
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.matches("^(([0-1]\\d)|(2[0-3])):[0-5]\\d:[0-5]\\d\n?$")) {
+                sortedTimes.add(line);
+            } else throw new IllegalArgumentException("Incorrect time format.");
         }
+        input.close();
+
+        Collections.sort(sortedTimes);
+
+        FileWriter output = new FileWriter(new File(outputName));
+        for (String time : sortedTimes) {
+            output.write(time + "\n");
+        }
+        output.close();
     }
 
     /**
@@ -90,51 +85,46 @@ public class JavaTasks {
      * Трудоемкость: T = O()
      * Ресурсоемкость: R = O()
      */
-    static public void sortAddresses(String inputName, String outputName) {
-        try {
-            Scanner input = new Scanner(new File(inputName));
-            TreeMap<String, String> oldLines = new TreeMap<>();
+    static public void sortAddresses(String inputName, String outputName) throws IOException {
+        Scanner input = new Scanner(new File(inputName));
+        List<List<String>> oldLines = new ArrayList<>();
 
-            while (input.hasNextLine()) {
-                String line = input.nextLine();
-                if (line.matches("^[А-я]+ [А-я]+ - [А-я]+ \\d+$")) {
-                    String[] addresses = line.split(" - ");
-                    oldLines.put(addresses[0], addresses[1]);
-                }
-            }
-            input.close();
-
-            TreeMap<String, TreeSet<String>> newLines = new TreeMap<>();
-            for (int i = 0; i < oldLines.size(); i++) {
-                String name = oldLines.keySet().toArray()[i].toString();
-                String address = oldLines.get(name);
-
-                if (!newLines.containsKey(address)) {
-                    TreeSet<String> names = new TreeSet<>();
-                    names.add(name);
-                    newLines.put(address, names);
-                }
-                else
-                    newLines.get(address).add(name);
-            }
-
-            FileWriter output = new FileWriter(new File(outputName));
-            for (String key : newLines.keySet()) {
-                StringBuilder namesLine = new StringBuilder();
-                TreeSet<String> namesSet = newLines.get(key);
-
-                if (namesSet.size() > 1) {
-                    for (int i = 0; i < namesSet.size() - 1; i++) {
-                        namesLine.append(namesSet.toArray()[i]).append(", ");
-                    }
-                }
-                namesLine.append(namesSet.toArray()[namesSet.size() - 1]);
-                output.write(key + " - " + namesLine + "\n");
-            }
-            output.close();
-        } catch (IOException e) {
-            System.out.println("File is not found.");
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.matches("^[А-я]+ [А-я]+ - [А-я]+ \\d+$")) {
+                String[] addresses = line.split(" - ");
+                oldLines.add(Arrays.asList(addresses[0], addresses[1]));
+            } else throw new IllegalArgumentException("Illegal line format.");
         }
+        input.close();
+
+        Map<String, Set<String>> newLines = new TreeMap<>();
+        for (List<String> oldLine : oldLines) {
+            String name = oldLine.get(0);
+            String address = oldLine.get(1);
+
+            if (!newLines.containsKey(address)) {
+                Set<String> names = new TreeSet<>();
+                names.add(name);
+                newLines.put(address, names);
+            } else
+                newLines.get(address).add(name);
+        }
+
+        FileWriter output = new FileWriter(new File(outputName));
+        for (String key : newLines.keySet()) {
+            StringBuilder namesLine = new StringBuilder();
+            Set<String> namesSet = newLines.get(key);
+
+            if (namesSet.size() > 1) {
+                for (int i = 0; i < namesSet.size() - 1; i++) {
+                    namesLine.append(namesSet.toArray()[i]).append(", ");
+                }
+            }
+            namesLine.append(namesSet.toArray()[namesSet.size() - 1]);
+            output.write(key + " - " + namesLine + "\n");
+        }
+        output.close();
     }
 
     /**
@@ -167,32 +157,31 @@ public class JavaTasks {
      * 99.5
      * 121.3
      *
-     * Трудоекость: T = O()
-     * Ресурсоемкость: R = O()
+     * Трудоекость: T = O(n)
+     * Ресурсоемкость: R = O(n)
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        try {
-            Scanner input = new Scanner(new File(inputName));
-            ArrayList<Double> temperatures = new ArrayList<>();
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
+        Scanner input = new Scanner(new File(inputName));
+        List<Double> temperatures = new ArrayList<>();
 
-            while (input.hasNextLine()) {
-                String line = input.nextLine();
-                if (line.matches("^-?\\d+.\\d$")) {
-                    temperatures.add(Double.parseDouble(line));
-                }
-            }
-            input.close();
-
-            Collections.sort(temperatures);
-
-            FileWriter output = new FileWriter(new File(outputName));
-            for (double temp : temperatures) {
-                output.write(temp + "\n");
-            }
-            output.close();
-        } catch (IOException e) {
-            System.out.println("File is not found.");
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.matches("^-?\\d+.\\d$")) {
+                double temperature = Double.parseDouble(line);
+                if (temperature >= -273.0 && temperature <= 500.0) {
+                    temperatures.add(temperature);
+                } else throw new IllegalArgumentException("Illegal temperature.");
+            } else throw new IllegalArgumentException("Illegal temperature.");
         }
+        input.close();
+
+        Collections.sort(temperatures);
+
+        FileWriter output = new FileWriter(new File(outputName));
+        for (double temp : temperatures) {
+            output.write(temp + "\n");
+        }
+        output.close();
     }
 
     /**
@@ -224,58 +213,54 @@ public class JavaTasks {
      * 2
      * 2
      *
-     * Трудоемкость: T = O()
+     * Трудоемкость: T = O(n)
      * Ресурсоемкость: R = O()
      */
-    static public void sortSequence(String inputName, String outputName) {
-        try {
-            Scanner input = new Scanner(new File(inputName));
-            ArrayList<Integer> nums = new ArrayList<>();
+    static public void sortSequence(String inputName, String outputName) throws IOException {
+        Scanner input = new Scanner(new File(inputName));
+        List<Integer> nums = new ArrayList<>();
 
-            while (input.hasNextInt()) {
-                int num = input.nextInt();
-                if (num > 0) {
-                    nums.add(num);
-                }
-            }
-
-            HashMap<Integer, Integer> statistic = new HashMap<>();
-            ArrayList<Integer> mostFrequentNums = new ArrayList<>();
-            int maxRepeats = 0;
-            for (Integer num : nums) {
-                int repeats = statistic.get(num) == null ? 1 : (statistic.get(num) + 1);
-                if (repeats == maxRepeats) {
-                    mostFrequentNums.add(num);
-                }
-                if (repeats > maxRepeats) {
-                    maxRepeats = repeats;
-                    mostFrequentNums.clear();
-                    mostFrequentNums.add(num);
-                }
-                statistic.put(num, repeats);
-            }
-
-            int minFrequentNum = mostFrequentNums.get(0);
-            for (int i = 1; i < mostFrequentNums.size(); i++) {
-                int num = nums.get(i);
-                if (mostFrequentNums.get(i) < minFrequentNum) {
-                    minFrequentNum = mostFrequentNums.get(i);
-                }
-            }
-
-            FileWriter output = new FileWriter(new File(outputName));
-            for (int num : nums) {
-                if (num != minFrequentNum) {
-                    output.write(num + "\n");
-                }
-            }
-            for (int i = 0; i < maxRepeats; i++) {
-                output.write(minFrequentNum + "\n");
-            }
-            output.close();
-        } catch (IOException e) {
-            System.out.println("File is not found.");
+        while (input.hasNextInt()) {
+            int num = input.nextInt();
+            if (num > 0) {
+                nums.add(num);
+            } else throw new IllegalArgumentException("Illegal number format.");
         }
+
+        Map<Integer, Integer> statistic = new HashMap<>();
+        List<Integer> mostFrequentNums = new ArrayList<>();
+        int maxRepeats = 0;
+        for (Integer num : nums) {
+            int repeats = statistic.get(num) == null ? 1 : (statistic.get(num) + 1);
+            if (repeats == maxRepeats) {
+                mostFrequentNums.add(num);
+            }
+            if (repeats > maxRepeats) {
+                maxRepeats = repeats;
+                mostFrequentNums.clear();
+                mostFrequentNums.add(num);
+            }
+            statistic.put(num, repeats);
+        }
+
+        int minFrequentNum = mostFrequentNums.get(0);
+        for (int i = 1; i < mostFrequentNums.size(); i++) {
+            int num = nums.get(i);
+            if (mostFrequentNums.get(i) < minFrequentNum) {
+                minFrequentNum = mostFrequentNums.get(i);
+            }
+        }
+
+        FileWriter output = new FileWriter(new File(outputName));
+        for (int num : nums) {
+            if (num != minFrequentNum) {
+                output.write(num + "\n");
+            }
+        }
+        for (int i = 0; i < maxRepeats; i++) {
+            output.write(minFrequentNum + "\n");
+        }
+        output.close();
     }
 
     /**
