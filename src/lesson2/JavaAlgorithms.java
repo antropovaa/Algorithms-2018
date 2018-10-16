@@ -80,9 +80,17 @@ public class JavaAlgorithms {
      * Х Х 3
      * Х   Х
      * Х х Х
+     *
+     * Трудоемкость: T = O(n), где n = menNumber
+     * Ресурсоемкость: R = О(1)
      */
     static public int josephTask(int menNumber, int choiceInterval) {
-        throw new NotImplementedError();
+        if (menNumber == 0) throw new IllegalArgumentException("Number of men has to be more then 1.");
+        int result = 0;
+        for (int i = 1; i <= menNumber; ++i) {
+            result = (result + choiceInterval) % i;
+        }
+        return result + 1;
     }
 
     /**
@@ -95,9 +103,31 @@ public class JavaAlgorithms {
      * При сравнении подстрок, регистр символов *имеет* значение.
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
+     *
+     * Трудоемкость: Т = О(n * m), где n = first.length(), m = second.length()
+     * Ресурсоемкость: R = O(n * m)
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    static public String longestCommonSubstring(String first, String second) {
+        int[][] matches = new int[first.length()][second.length()];
+        int maxLength = 0;
+        int maxIndex = -1;
+
+        for (int i = 0; i < first.length(); i++) {
+            for (int j = 0; j < second.length(); j++) {
+                if (i > 0 && j > 0) {
+                    if (first.charAt(i - 1) == second.charAt(j - 1)) {
+                        int currentLength = matches[i - 1][j - 1] + 1;
+                        matches[i][j] = currentLength;
+                        if (currentLength > maxLength) {
+                            maxLength = currentLength;
+                            maxIndex = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        return (maxIndex == -1) ? "" : first.substring(maxIndex - maxLength, maxIndex);
     }
 
     /**
@@ -109,9 +139,31 @@ public class JavaAlgorithms {
      *
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
+     *
+     * Трудоемкость: T = O(n * log(log(n))), где n = limit
+     * Ресурсоемкоть: R = O(n)
      */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+
+        int[]primes = new int[limit + 1];
+        primes[0] = 1;
+        primes[1] = 1;
+
+        for (int num = 2; num <= (int) Math.sqrt(limit); num++) {
+            if (num * num > limit) break;
+            if (primes[num] == 0) {
+                for (int i = num * num; i <= limit; i += num) {
+                    primes[i] = 1;
+                }
+            }
+        }
+
+        int result = 0;
+        for (int num : primes) {
+            if (num == 0) result++;
+        }
+        return result;
     }
 
     /**
