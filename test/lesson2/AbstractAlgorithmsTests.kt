@@ -2,9 +2,11 @@ package lesson2
 
 import java.io.BufferedWriter
 import java.io.File
+import java.io.FileNotFoundException
 import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 abstract class AbstractAlgorithmsTests {
 
@@ -48,6 +50,16 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(8 to 12, optimizeBuyAndSell("input/buysell_in2.txt"))
         assertEquals(3 to 4, optimizeBuyAndSell("input/buysell_in3.txt"))
         try {
+            optimizeBuyAndSell("input/buysell_in4.txt")
+            fail("IllegalArgumentException is expected.")
+        } catch (e: IllegalArgumentException) {
+        }
+        try {
+            optimizeBuyAndSell("input/buysell_in5.txt")
+            fail("FileNotFoundException is expected.")
+        } catch (e: FileNotFoundException) {
+        }
+        try {
             val expectedAnswer = generatePrices(1000)
             assertEquals(expectedAnswer, optimizeBuyAndSell("temp_prices.txt"))
         } finally {
@@ -64,6 +76,7 @@ abstract class AbstractAlgorithmsTests {
     fun josephTask(josephTask: (Int, Int) -> Int) {
         try {
             josephTask(0, 1)
+            fail("IllegalArgumentException is expected.")
         } catch (e: IllegalArgumentException) {
         }
         assertEquals(1, josephTask(1, 1))
