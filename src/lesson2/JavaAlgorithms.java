@@ -3,6 +3,11 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -30,9 +35,48 @@ public class JavaAlgorithms {
      * Например, для приведённого выше файла результат должен быть Pair(3, 4)
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
+     *
+     * Трудоемкость: T = O(n), где n - количество строк в inputName (кол-во цен)
+     * Реусурсоемкость: R = O(n)
      */
-    static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        throw new NotImplementedError();
+    static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) throws FileNotFoundException {
+        Scanner input = new Scanner(new FileReader(inputName));
+        List<Integer> prices = new ArrayList<>();
+        while (input.hasNextInt()) {
+            int price = input.nextInt();
+            if (price > 0) {
+                prices.add(price);
+            } else throw new IllegalArgumentException("Prices have to be more than 0.");
+        }
+
+        List<Integer> delta = new ArrayList<>();
+        List<Pair<Integer, Integer>> indexes = new ArrayList<>();
+        for (int i = 0; i < prices.size() - 1; i++) {
+            delta.add(prices.get(i + 1) - prices.get(i));
+            indexes.add(new Pair<>(i + 1, i + 2));
+        }
+
+        int startIndex = 0;
+        int lastIndex = 0;
+        int maxSum = delta.get(0);
+
+        int lastStartIndex = 0;
+        int lastSum = delta.get(0);
+
+        for (int i = 0; i < delta.size(); i++) {
+            int currentDelta = delta.get(i);
+            lastSum += currentDelta;
+            if (lastSum < currentDelta) {
+                lastSum = currentDelta;
+                lastStartIndex = i;
+            }
+            if (lastSum > maxSum) {
+                startIndex = lastStartIndex;
+                lastIndex = i;
+                maxSum = lastSum;
+            }
+        }
+        return new Pair<>(indexes.get(startIndex).getFirst(), indexes.get(lastIndex).getSecond());
     }
 
     /**
@@ -161,7 +205,8 @@ public class JavaAlgorithms {
 
         int result = 0;
         for (int num : primes) {
-            if (num == 0) result++;
+            if (num == 0)
+                result++;
         }
         return result;
     }
