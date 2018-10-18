@@ -33,7 +33,7 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      *
-     * Трудоемкость: T = O(n)
+     * Трудоемкость: T = O(n * log(n)), где n - кол-во моментов времени
      * Ресурсоемкость: R = O(n)
      */
     static public void sortTimes(String inputName, String outputName) throws IOException {
@@ -82,8 +82,8 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      *
-     * Трудоемкость: T = O()
-     * Ресурсоемкость: R = O()
+     * Трудоемкость: T = O(n * log(n)), где n - кол-во строчек в файле inputName
+     * Ресурсоемкость: R = O(n + n) = O(n)
      */
     static public void sortAddresses(String inputName, String outputName) throws IOException {
         Scanner input = new Scanner(new File(inputName));
@@ -157,31 +157,56 @@ public class JavaTasks {
      * 99.5
      * 121.3
      *
-     * Трудоекость: T = O(n)
+     * Трудоекость: T = O(n), где n  - кол-во строчек в inputName (кол-во температур)
      * Ресурсоемкость: R = O(n)
      */
     static public void sortTemperatures(String inputName, String outputName) throws IOException {
         Scanner input = new Scanner(new File(inputName));
-        List<Double> temperatures = new ArrayList<>();
+        List<Integer> temperatures = new ArrayList<>();
 
         while (input.hasNextLine()) {
             String line = input.nextLine();
             if (line.matches("^-?\\d+.\\d$")) {
-                double temperature = Double.parseDouble(line);
-                if (temperature >= -273.0 && temperature <= 500.0) {
-                    temperatures.add(temperature);
+                double temperature = Double.parseDouble(line) * 10;
+                if (temperature >= -2730 && temperature <= 5000) {
+                    temperatures.add((int) temperature);
                 } else throw new IllegalArgumentException("Illegal temperature.");
             } else throw new IllegalArgumentException("Illegal temperature.");
         }
         input.close();
 
-        Collections.sort(temperatures);
+        countingSort(temperatures);
 
         FileWriter output = new FileWriter(new File(outputName));
-        for (double temp : temperatures) {
-            output.write(temp + "\n");
+        for (int temp : temperatures) {
+            output.write(Double.parseDouble(String.valueOf(temp)) / 10 + "\n");
         }
         output.close();
+    }
+
+    static private void countingSort(List<Integer> list) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        for (int element : list) {
+            if (element < min) {
+                min = element * 10; }
+            if (element > max) {
+                max = element * 10;
+            }
+        }
+
+        int[] buckets = new int[max - min + 1];
+        for (int element : list) {
+            buckets[element - min]++;
+        }
+
+        int arrayIndex = 0;
+        for (int i = 0; i < buckets.length; i++) {
+            for (int j = buckets[i]; j > 0; j--) {
+                list.set(arrayIndex++, i + min);
+            }
+        }
     }
 
     /**
@@ -214,7 +239,7 @@ public class JavaTasks {
      * 2
      *
      * Трудоемкость: T = O(n)
-     * Ресурсоемкость: R = O()
+     * Ресурсоемкость: R = O(n + m + l), где n - кол-во чисел, m = statistic.size(), l = mostFrequentNums.size()
      */
     static public void sortSequence(String inputName, String outputName) throws IOException {
         Scanner input = new Scanner(new File(inputName));
@@ -277,8 +302,8 @@ public class JavaTasks {
      *
      * Результат: second = [1 3 4 9 9 13 15 20 23 28]
      *
-     * Трудоемкость: T = O()
-     * Ресурсоемкость: R = O()
+     * Трудоемкость: T = O(n), где n  = second.length
+     * Ресурсоемкость: R = O(1)
      */
     static <T extends Comparable<T>> void mergeArrays(T[] first, T[] second) {
         int li = 0, ri = first.length;
@@ -293,4 +318,3 @@ public class JavaTasks {
         }
     }
 }
-
