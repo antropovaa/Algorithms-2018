@@ -1,14 +1,10 @@
 package lesson2;
 
-import kotlin.NotImplementedError;
 import kotlin.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
@@ -236,8 +232,69 @@ public class JavaAlgorithms {
      * Все слова и буквы -- русские или английские, прописные.
      * В файле буквы разделены пробелами, строки -- переносами строк.
      * Остальные символы ни в файле, ни в словах не допускаются.
+     *
+     * Трудоемкость: T = O(???)
+     * Ресурсоемкость: R = O(m * n), где m * n - общее кол-во букв в заданной матрицы
      */
-    static public Set<String> baldaSearcher(String inputName, Set<String> words) {
-        throw new NotImplementedError();
+    static class Balda {
+        private static List<String[]> strings;
+        private static int width;
+        private static int height;
+        private static String[][] matrix;
+        private static String currentWord;
+        private static Set<String> result;
+
+        static public Set<String> baldaSearcher(String inputName, Set<String> words) throws FileNotFoundException {
+            width = 0;
+            height = 0;
+            strings = new ArrayList<>();
+            Scanner input = new Scanner(new FileReader(inputName));
+            while (input.hasNextLine()) {
+                String[] string = input.nextLine().split(" ");
+                width = string.length;
+                strings.add(string);
+                height++;
+            }
+
+            matrix = new String[height][width];
+            for (int i = 0; i < height; i++) {
+                matrix[i] = strings.get(i);
+            }
+
+            result = new HashSet<>();
+            for (String word : words) {
+                String first = String.valueOf(word.charAt(0));
+                currentWord = word;
+                for (int i = 0; i < height; i++) {
+                    for (int j = 0; j < width; j++) {
+                        if (first.equals(matrix[i][j])) {
+                            int letter = 0;
+                            search(i, j, letter);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        static private void search(int row, int column, int letter) {
+            if (letter != currentWord.length() - 1) {
+                String nextLetter = String.valueOf(currentWord.charAt(letter + 1));
+                if (column + 1 < width && matrix[row][column + 1].equals(nextLetter)) {
+                    search(row, column + 1, letter + 1);
+                }
+                if (column - 1 >= 0 && matrix[row][column - 1].equals(nextLetter)) {
+                    search(row, column - 1, letter + 1);
+                }
+                if (row - 1 >= 0 && matrix[row - 1][column].equals(nextLetter)) {
+                    search(row - 1, column, letter + 1);
+                }
+                if (row + 1 < height && matrix[row + 1][column].equals(nextLetter)) {
+                    search(row + 1, column, letter + 1);
+                }
+            } else
+                result.add(currentWord);
+        }
     }
 }
