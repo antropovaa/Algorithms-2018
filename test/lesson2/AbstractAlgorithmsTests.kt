@@ -696,5 +696,12 @@ abstract class AbstractAlgorithmsTests {
     fun baldaSearcher(baldaSearcher: (String, Set<String>) -> Set<String>) {
         assertEquals(setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ"),
                 baldaSearcher("input/balda_in1.txt", setOf("ТРАВА", "КРАН", "АКВА", "НАРТЫ", "РАК")))
+        try {
+            baldaSearcher("input/buysell_in9.txt", setOf(""))
+            fail("FileNotFoundException is expected.")
+        } catch (e: FileNotFoundException) {
+        }
+        assertEquals(setOf("ХРУСТАЛЬ", "ТАЛЬ", "ХРУСТ", "СТАЛЬ"),
+                baldaSearcher("input/balda_in2.txt", setOf("ХРУСТАЛЬ", "ТАЛЬ", "ХРУСТ", "СТАЛЬ")))
     }
 }

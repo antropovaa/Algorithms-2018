@@ -31,6 +31,6 @@ class AlgorithmsTestsJava : AbstractAlgorithmsTests() {
     @Test
     @Tag("Hard")
     fun testBaldaSearcher() {
-        baldaSearcher { inputName, words -> JavaAlgorithms.baldaSearcher(inputName, words) }
+        baldaSearcher { inputName, words -> JavaAlgorithms.Balda.baldaSearcher(inputName, words) }
     }
 }
