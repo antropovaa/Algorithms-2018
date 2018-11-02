@@ -57,7 +57,7 @@ public class JavaAlgorithms {
         int maxSum = delta.get(0);
 
         int lastStartIndex = 0;
-        int lastSum = delta.get(0);
+        int lastSum = 0;
 
         for (int i = 0; i < delta.size(); i++) {
             int currentDelta = delta.get(i);
@@ -233,7 +233,7 @@ public class JavaAlgorithms {
      * В файле буквы разделены пробелами, строки -- переносами строк.
      * Остальные символы ни в файле, ни в словах не допускаются.
      *
-     * Трудоемкость: T = O(???)
+     * Трудоемкость (с учетом рекурсивной функции): T = O(m^2 * n^2), где m и n - ширина и высота матрицы
      * Ресурсоемкость: R = O(m * n), где m * n - общее кол-во букв в заданной матрицы
      */
     static class Balda {
@@ -278,6 +278,10 @@ public class JavaAlgorithms {
             return result;
         }
 
+        /**
+         * Трудоемкость: T(O) = O(m * n), где m - ширина матрицы, n - высота, поскольку в самом худшем случае слово
+         * "соберется" из каждого элемента матрицы, то есть функция вызовется столько раз, сколько элементов
+         */
         static private void search(int row, int column, int letter) {
             if (letter != currentWord.length() - 1) {
                 String nextLetter = String.valueOf(currentWord.charAt(letter + 1));
