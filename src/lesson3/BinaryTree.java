@@ -20,6 +20,10 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         Node(T value) {
             this.value = value;
         }
+
+        T getValue() {
+            return value;
+        }
     }
 
     private Node<T> root = null;
@@ -63,11 +67,90 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     /**
      * Удаление элемента в дереве
      * Средняя
+     *
+     * Трудоемкость: T = O(logN), где N - количество узлов в дереве
+     * Ресурсоемкость: R = O(1)
      */
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        Node<T> current = root;
+        Node<T> parent = root;
+
+        boolean isLeftChild = true;
+        int compare;
+
+        while ((compare = current.getValue().compareTo((T) o)) != 0) {
+            parent = current;
+
+            if (compare > 0) {
+                isLeftChild = true;
+                current = current.left;
+            } else {
+                isLeftChild = false;
+                current = current.right;
+            }
+
+            if (current == null)
+                return false;
+        }
+
+        if (current.left == null && current.right == null) {
+            if (current == root) {
+                root = null;
+            } else if (isLeftChild) {
+                parent.left = null;
+            } else
+                parent.right = null;
+
+        } else if (current.right == null) {
+            if (current == root) {
+                root = current.left;
+            } else if (isLeftChild) {
+                parent.left = current.left;
+            } else
+                parent.right = current.left;
+
+        } else if (current.left == null) {
+            if (current == root) {
+                root = current.right;
+            } else if (isLeftChild) {
+                parent.left = current.right;
+            } else
+                parent.right = current.right;
+
+        } else {
+            Node replacement = getReplacementNode(current);
+
+            if (current == root) {
+                root = replacement;
+            } else if (isLeftChild) {
+                parent.left = replacement;
+            } else
+                parent.right = replacement;
+
+            replacement.left = current.left;
+        }
+        size--;
+        return true;
+    }
+
+    public Node<T> getReplacementNode(Node<T> replaceNode) {
+        Node<T> replacementParent = replaceNode;
+        Node<T> replacement = replaceNode;
+        Node<T> focusNode = replaceNode.right;
+
+        while (focusNode != null) {
+            replacementParent = replacement;
+            replacement = focusNode;
+            focusNode = focusNode.left;
+        }
+
+        if (replacement != replaceNode.right) {
+            replacementParent.left = replacement.right;
+            replacement.right = replaceNode.right;
+        }
+
+        return replacement;
     }
 
     @Override
@@ -101,38 +184,83 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     public class BinaryTreeIterator implements Iterator<T> {
 
         private Node<T> current = null;
+        private LinkedList<Node<T>> list = new LinkedList<>();
+        private boolean nextIteration = false;
 
-        private BinaryTreeIterator() {}
+        private BinaryTreeIterator() { }
 
         /**
          * Поиск следующего элемента
          * Средняя
+         *
+         * Трудоемкость: T = O(logN)
+         * Ресурсоемкость: R = O(N)
          */
         private Node<T> findNext() {
-            // TODO
-            throw new NotImplementedError();
+            if (root == null)
+                return null;
+
+            if (current != null && current.getValue() == last())
+                return null;
+
+            if (current == null) {
+                current = root;
+                while (current.left != null) {
+                    list.addLast(current);
+                    current = current.left;
+                }
+                return current;
+            }
+
+            if (current.right == null) {
+                current = list.getLast();
+                list.removeLast();
+                return current;
+            }
+
+            current = current.right;
+            while (current.left != null) {
+                list.addLast(current);
+                current = current.left;
+            }
+            return current;
         }
 
         @Override
         public boolean hasNext() {
+            nextIteration = true;
             return findNext() != null;
         }
 
         @Override
         public T next() {
+            if (nextIteration) {
+                nextIteration = false;
+                return current.value;
+            }
             current = findNext();
             if (current == null) throw new NoSuchElementException();
-            return current.value;
+            return current.getValue();
         }
 
         /**
          * Удаление следующего элемента
          * Сложная
+         *
+         * Трудоемкость: T = O(logN), т.к. в методе next() используется метод findNext()
+         * Ресурсоемкость: R = O(N)
          */
         @Override
         public void remove() {
-            // TODO
-            throw new NotImplementedError();
+            T last = current.getValue();
+
+            if (!hasNext()) {
+                BinaryTree.this.remove(last);
+                current = find(last());
+            } else {
+                BinaryTree.this.remove(last);
+                next();
+            }
         }
     }
 
