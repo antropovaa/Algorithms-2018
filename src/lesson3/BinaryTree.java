@@ -11,7 +11,7 @@ import java.util.*;
 public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
 
     private static class Node<T> {
-        final T value;
+        T value;
 
         Node<T> left = null;
 
@@ -20,15 +20,13 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         Node(T value) {
             this.value = value;
         }
-
-        T getValue() {
-            return value;
-        }
     }
 
     private Node<T> root = null;
 
     private int size = 0;
+
+    private boolean isLeftChild;
 
     @Override
     public boolean add(T t) {
@@ -76,10 +74,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         Node<T> current = root;
         Node<T> parent = root;
 
-        boolean isLeftChild = true;
+        isLeftChild = true;
         int compare;
 
-        while ((compare = current.getValue().compareTo((T) o)) != 0) {
+        @SuppressWarnings("unchecked") T key = (T) o;
+
+        while ((compare = current.value.compareTo(key)) != 0) {
             parent = current;
 
             if (compare > 0) {
@@ -94,6 +94,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
                 return false;
         }
 
+        delete(current, parent);
+        size--;
+        return true;
+    }
+
+    private void delete(Node<T> current, Node<T> parent) {
         if (current.left == null && current.right == null) {
             if (current == root) {
                 root = null;
@@ -130,11 +136,9 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
 
             replacement.left = current.left;
         }
-        size--;
-        return true;
     }
 
-    public Node<T> getReplacementNode(Node<T> replaceNode) {
+    private Node<T> getReplacementNode(Node<T> replaceNode) {
         Node<T> replacementParent = replaceNode;
         Node<T> replacement = replaceNode;
         Node<T> focusNode = replaceNode.right;
@@ -184,82 +188,62 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     public class BinaryTreeIterator implements Iterator<T> {
 
         private Node<T> current = null;
-        private LinkedList<Node<T>> list = new LinkedList<>();
-        private boolean nextIteration = false;
+        private LinkedList<Node<T>> list;
 
-        private BinaryTreeIterator() { }
+        private BinaryTreeIterator() {
+            list = new LinkedList<>();
+            while (root != null) {
+                list.addFirst(root);
+                root = root.left;
+            }
+        }
 
         /**
          * Поиск следующего элемента
          * Средняя
          *
-         * Трудоемкость: T = O(logN)
+         * Трудоемкость: T = O(1)
          * Ресурсоемкость: R = O(N)
          */
         private Node<T> findNext() {
-            if (root == null)
-                return null;
-
-            if (current != null && current.getValue() == last())
-                return null;
-
-            if (current == null) {
-                current = root;
-                while (current.left != null) {
-                    list.addLast(current);
-                    current = current.left;
-                }
-                return current;
-            }
-
-            if (current.right == null) {
-                current = list.getLast();
-                list.removeLast();
-                return current;
-            }
-
-            current = current.right;
-            while (current.left != null) {
-                list.addLast(current);
-                current = current.left;
-            }
-            return current;
+            Node<T> next = list.getFirst();
+            list.removeFirst();
+            return next;
         }
 
         @Override
         public boolean hasNext() {
-            nextIteration = true;
-            return findNext() != null;
+            return !list.isEmpty();
         }
 
         @Override
         public T next() {
-            if (nextIteration) {
-                nextIteration = false;
-                return current.value;
-            }
             current = findNext();
-            if (current == null) throw new NoSuchElementException();
-            return current.getValue();
+            while (current.right != null) {
+                list.addFirst(current.right);
+                current.right = current.right.left;
+            }
+            return current.value;
         }
 
         /**
          * Удаление следующего элемента
          * Сложная
          *
-         * Трудоемкость: T = O(logN), т.к. в методе next() используется метод findNext()
+         * Трудоемкость: T = O(logN), т.к. используется метод last()
          * Ресурсоемкость: R = O(N)
          */
         @Override
         public void remove() {
-            T last = current.getValue();
-
-            if (!hasNext()) {
-                BinaryTree.this.remove(last);
-                current = find(last());
-            } else {
-                BinaryTree.this.remove(last);
-                next();
+            if (current != null) {
+                Node<T> parent;
+                if (hasNext()) {
+                    parent = findNext();
+                } else {
+                    parent = find(last());
+                }
+                delete(current, parent);
+                size--;
             }
         }
     }
@@ -296,12 +280,45 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
     /**
      * Найти множество всех элементов меньше заданного
      * Сложная
+     *
+     * Трудоемкость: T = O(N), т.к. максимальное число вызова рекурсивных функций - общее кол-во узлов
+     * Ресурсоемкость: R = O(N)
      */
     @NotNull
     @Override
     public SortedSet<T> headSet(T toElement) {
-        // TODO
-        throw new NotImplementedError();
+        SortedSet<T> result = new TreeSet<>();
+        findHeadSet(root, toElement, result);
+        return result;
+    }
+
+    private void findHeadSet(Node<T> current, T toElement, SortedSet<T> result) {
+        int compare = toElement.compareTo(current.value);
+        if (compare > 0) { // toElement > current.value
+            result.add(current.value);
+            if (current.right != null) {
+                findHeadSet(current.right, toElement, result);
+            }
+            if (current.left != null) {
+                findHeadSet(current.left, toElement, result);
+            }
+        } else if (compare == 0) {
+            if (current.left != null) {
+                add(current.left, result);
+            }
+        } else if (current.left != null) {
+                findHeadSet(current.left, toElement, result);
+            }
+    }
+
+    private void add(Node<T> node, SortedSet<T> result) {
+        result.add(node.value);
+        if (node.left != null) {
+            add(node.left, result);
+        }
+        if (node.right != null) {
+            add(node.right, result);
+        }
     }
 
     /**
