@@ -2,11 +2,16 @@ package lesson5;
 
 import kotlin.NotImplementedError;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
+    public JavaGraphTasks() {
+    }
+
     /**
      * Эйлеров цикл.
      * Средняя
@@ -32,9 +37,53 @@ public class JavaGraphTasks {
      *
      * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
      * связного графа ровно по одному разу
+     *
+     * Трудоемкость: T = O(n^2), где n - количество вершин в графе
+     * Ресурсоемкость: R = O(n)
      */
     public static List<Graph.Edge> findEulerLoop(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> V = graph.getVertices();
+        Set<Graph.Edge> E = graph.getEdges();
+        List<Graph.Vertex> result = new ArrayList<>();
+        List<Graph.Edge> eulerLoop = new ArrayList<>();
+
+        if (itIsEulerGraph(graph)) {
+            Stack<Graph.Vertex> s = new Stack<>();
+            Graph.Vertex v = V.iterator().next();
+            s.push(v);
+            while (!s.empty()) {
+                Graph.Vertex w = s.peek();
+                for (Graph.Vertex u : V) {
+                    Graph.Edge e = graph.getConnection(w, u);
+                    if (E.contains(e)) { // нашли ребро, по которому еще не проходили
+                        s.push(u);
+                        E.remove(e); // удалили это ребро
+                        break;
+                    }
+                }
+                if (w == s.peek()) { // не нашли инцидентных ребер для вершины w, по которым еще не прошли
+                    s.pop();
+                    result.add(w);
+                }
+            }
+
+            for (int i = 0; i < result.size() - 1; i++) {
+                eulerLoop.add(graph.getConnection(result.get(i), result.get(i + 1)));
+            }
+        } else
+            throw new IllegalArgumentException("This graph is not Euler graph, it is impossible to find Euler loop.");
+
+        return eulerLoop;
+    }
+
+    private static boolean itIsEulerGraph(Graph graph) {
+        int oddVertex = 0;
+        for (Graph.Vertex vertex : graph.getVertices()) {
+            if (graph.getEdges().size() % 2 == 1) {
+                oddVertex++;
+            }
+        }
+        return oddVertex != 2;
     }
 
     /**
