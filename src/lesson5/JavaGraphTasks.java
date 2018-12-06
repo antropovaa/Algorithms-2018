@@ -39,16 +39,15 @@ public class JavaGraphTasks {
      * Ресурсоемкость: R = O(n)
      */
 
-    private static List<Graph.Vertex> result;
-
     public static List<Graph.Edge> findEulerLoop(Graph graph) {
-        result = new ArrayList<>();
+        List<Graph.Vertex> result = new ArrayList<>();
         Set<Graph.Vertex> V = graph.getVertices();
         Set<Graph.Edge> E = graph.getEdges();
         List<Graph.Edge> eulerLoop = new ArrayList<>();
 
         if (isThereEulerLoop(graph)) {
-            findLoop(V.iterator().next(), graph, V, E);
+            findLoop(V.iterator().next(), graph, V, E, result);
+
             for (int i = 0; i < result.size() - 1; i++) {
                 eulerLoop.add(graph.getConnection(result.get(i), result.get(i + 1)));
             }
@@ -57,12 +56,12 @@ public class JavaGraphTasks {
         return eulerLoop;
     }
 
-    private static void findLoop(Graph.Vertex v, Graph graph, Set<Graph.Vertex> V, Set<Graph.Edge> E) {
+    private static void findLoop(Graph.Vertex v, Graph graph, Set<Graph.Vertex> V, Set<Graph.Edge> E, List<Graph.Vertex> result) {
         for (Graph.Vertex u : V) {
             Graph.Edge e = graph.getConnection(v, u);
             if (E.contains(e)) {
                 E.remove(e);
-                findLoop(u, graph, V, E);
+                findLoop(u, graph, V, E, result);
             }
         }
         result.add(v);
