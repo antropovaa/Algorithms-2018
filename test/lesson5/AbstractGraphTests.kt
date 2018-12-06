@@ -67,7 +67,7 @@ abstract class AbstractGraphTests {
         loop2.assert(true, graph2)
     }
 
-    fun isItEulerGraph(isItEulerGraph: Graph.() -> Boolean) {
+    fun isThereEulerLoop(isThereEulerLoop: Graph.() -> Boolean) {
         val notEulerGraph = GraphBuilder().apply {
             val a = addVertex("A")
             val b = addVertex("B")
@@ -81,7 +81,7 @@ abstract class AbstractGraphTests {
             addConnection(c, d)
         }.build()
 
-        assertEquals(false, isItEulerGraph(notEulerGraph))
+        assertEquals(false, isThereEulerLoop(notEulerGraph))
 
         val eulerGraph = GraphBuilder().apply {
             val a = addVertex("A")
@@ -95,7 +95,7 @@ abstract class AbstractGraphTests {
             addConnection(b, d)
         }.build()
 
-        assertEquals(true, isItEulerGraph(eulerGraph))
+        assertEquals(true, isThereEulerLoop(eulerGraph))
     }
 
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {

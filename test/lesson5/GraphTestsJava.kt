@@ -13,7 +13,7 @@ class GraphTestsJava : AbstractGraphTests() {
     @Test
     @Tag("Additional")
     fun testIsItEulerGraph() {
-        isItEulerGraph { let { JavaGraphTasks.isItEulerGraph(it) } }
+        isThereEulerLoop { let { JavaGraphTasks.isThereEulerLoop(it) } }
     }
 
     @Test

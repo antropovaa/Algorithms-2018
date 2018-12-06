@@ -47,7 +47,7 @@ public class JavaGraphTasks {
         Set<Graph.Edge> E = graph.getEdges();
         List<Graph.Edge> eulerLoop = new ArrayList<>();
 
-        if (isItEulerGraph(graph)) {
+        if (isThereEulerLoop(graph)) {
             findLoop(V.iterator().next(), graph, V, E);
             for (int i = 0; i < result.size() - 1; i++) {
                 eulerLoop.add(graph.getConnection(result.get(i), result.get(i + 1)));
@@ -68,7 +68,7 @@ public class JavaGraphTasks {
         result.add(v);
     }
 
-    public static boolean isItEulerGraph(Graph graph) {
+    public static boolean isThereEulerLoop(Graph graph) {
         int oddVertex = 0;
         for (Graph.Vertex vertex : graph.getVertices()) {
             if (graph.getConnections(vertex).size() % 2 == 1) {
