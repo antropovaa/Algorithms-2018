@@ -11,6 +11,12 @@ class GraphTestsJava : AbstractGraphTests() {
     }
 
     @Test
+    @Tag("Additional")
+    fun testIsItEulerGraph() {
+        isItEulerGraph { let { JavaGraphTasks.isItEulerGraph(it) } }
+    }
+
+    @Test
     @Tag("Normal")
     fun testMinimumSpanningTree() {
         minimumSpanningTree { let { JavaGraphTasks.minimumSpanningTree(it) } }
@@ -27,5 +33,4 @@ class GraphTestsJava : AbstractGraphTests() {
     fun testLongestSimplePath() {
         longestSimplePath { let { JavaGraphTasks.longestSimplePath(it) } }
     }
-
 }
