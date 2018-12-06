@@ -71,7 +71,6 @@ public class JavaGraphTasks {
     public static boolean isItEulerGraph(Graph graph) {
         int oddVertex = 0;
         for (Graph.Vertex vertex : graph.getVertices()) {
-            Map<Graph.Vertex, Graph.Edge> connections = graph.getConnections(vertex);
             if (graph.getConnections(vertex).size() % 2 == 1) {
                 oddVertex++;
             }
