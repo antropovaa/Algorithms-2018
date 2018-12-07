@@ -132,6 +132,10 @@ public class JavaGraphTasks {
      * В данном случае ответ (A, E, F, D, G, J)
      *
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
+     *
+     * Трудоемкость: T = O(?)
+     * Ресурсоемкость: R = O(memory.size + (children.size + grandchildren.size) * V) = O(V + V^2) = O(V^2),
+     * где V - общее количество вершин в графе
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
         Map<Graph.Vertex, Set<Graph.Vertex>> memory = new HashMap<>();
