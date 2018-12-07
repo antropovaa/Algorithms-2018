@@ -134,7 +134,39 @@ public class JavaGraphTasks {
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Map<Graph.Vertex, Set<Graph.Vertex>> memory = new HashMap<>();
+        Graph.Vertex vertex = graph.getVertices().iterator().next();
+        return largestIndependentVertexSet(memory, vertex, vertex, graph);
+    }
+
+    private static Set<Graph.Vertex> largestIndependentVertexSet(Map<Graph.Vertex, Set<Graph.Vertex>> memory,
+                                                                 Graph.Vertex vertex, Graph.Vertex parent,
+                                                                 Graph graph) {
+        if (!memory.containsKey(vertex)) {
+            Set<Graph.Vertex> children = new HashSet<>();
+            Set<Graph.Vertex> grandchildren = new HashSet<>();
+
+            for (Graph.Vertex child : graph.getNeighbors(vertex)) {
+                if (child != parent) {
+                    children.addAll(largestIndependentVertexSet(memory, child, vertex, graph));
+
+                    for (Graph.Vertex grandchild : graph.getNeighbors(child)) {
+                        if (grandchild != vertex) {
+                            grandchildren.addAll(largestIndependentVertexSet(memory, grandchild, child, graph));
+                        }
+                    }
+                }
+                grandchildren.add(vertex);
+
+                if (children.size() > grandchildren.size())
+                    memory.put(vertex, children);
+                else {
+                    memory.put(vertex, grandchildren);
+                }
+            }
+        }
+
+        return memory.get(vertex);
     }
 
     /**
