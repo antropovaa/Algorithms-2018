@@ -1,6 +1,7 @@
 package lesson6
 
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 abstract class AbstractDynamicTests {
     fun longestCommonSubSequence(longestCommonSubSequence: (String, String) -> String) {
@@ -50,6 +51,12 @@ abstract class AbstractDynamicTests {
         assertEquals(1, shortestPathOnField("input/field_in2.txt"))
         assertEquals(12, shortestPathOnField("input/field_in1.txt"))
         assertEquals(43, shortestPathOnField("input/field_in3.txt"))
+        assertEquals(0, shortestPathOnField("input/field_in4.txt"))
+        try {
+            shortestPathOnField("input/field_in5.txt")
+            fail("Incorrect field format.")
+        } catch (e: IllegalArgumentException) {
+        }
     }
 
 }

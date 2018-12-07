@@ -2,7 +2,12 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 @SuppressWarnings("unused")
 public class JavaDynamicTasks {
@@ -56,9 +61,50 @@ public class JavaDynamicTasks {
      * Необходимо найти маршрут с минимальным весом и вернуть этот минимальный вес.
      *
      * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
+     *
+     * Трудоемкость: T = O(height + width + height + width * height) = O(width * height) = O(N), где N - кол-во клеток поля
+     * Ресурсоемкость: R = O(lines.size + field.size + metricField.size) = O(N)
      */
-    public static int shortestPathOnField(String inputName) {
-        throw new NotImplementedError();
+    public static int shortestPathOnField(String inputName) throws FileNotFoundException {
+        Scanner input = new Scanner(new File(inputName));
+        List<String[]> lines = new ArrayList<>();
+        int height = 0;
+        int width = 0;
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+            if (line.matches("^[0-9]( [0-9])*$")) {
+                String[] numbers = line.split(" ");
+                lines.add(numbers);
+                width = numbers.length;
+                height++;
+            } else throw new IllegalArgumentException("Incorrect field format.");
+        }
+        input.close();
+
+        String[][] field = new String[height][width];
+        int[][] metricField = new int[height][width];
+        for (int i = 0; i < height; i++) {
+            field[i] = lines.get(i);
+        }
+
+        metricField[0][0] = Integer.parseInt(field[0][0]);
+        for (int w = 1; w < width; w++) {
+            metricField[0][w] = metricField[0][w - 1] + Integer.parseInt(field[0][w]);
+        }
+        for (int h = 1; h < height; h++) {
+            metricField[h][0] = metricField[h - 1][0] + Integer.parseInt(field[h][0]);
+        }
+
+        for (int h = 1; h < height; h++) {
+            for (int w = 1; w < width; w++) {
+                int hSum = metricField[h][w - 1];
+                int wSum = metricField[h - 1][w];
+                int diagSum = metricField[h - 1][w - 1];
+                metricField[h][w] = Math.min(diagSum, Math.min(hSum, wSum)) + Integer.parseInt(field[h][w]);
+            }
+        }
+
+        return metricField[height - 1][width - 1];
     }
 
     // Задачу "Максимальное независимое множество вершин в графе без циклов"
