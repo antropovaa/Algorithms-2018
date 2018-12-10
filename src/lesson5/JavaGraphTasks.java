@@ -35,8 +35,8 @@ public class JavaGraphTasks {
      * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
      * связного графа ровно по одному разу
      *
-     * Трудоемкость: T = O(n^2), где n - количество вершин в графе
-     * Ресурсоемкость: R = O(n)
+     * Трудоемкость: T = O(V * E), где n - количество вершин в графе
+     * Ресурсоемкость: R = O(V + E)
      */
 
     public static List<Graph.Edge> findEulerLoop(Graph graph) {
@@ -56,7 +56,8 @@ public class JavaGraphTasks {
         return eulerLoop;
     }
 
-    private static void findLoop(Graph.Vertex v, Graph graph, Set<Graph.Vertex> V, Set<Graph.Edge> E, List<Graph.Vertex> result) {
+    private static void findLoop(Graph.Vertex v, Graph graph, Set<Graph.Vertex> V,
+                                 Set<Graph.Edge> E, List<Graph.Vertex> result) {
         for (Graph.Vertex u : V) {
             Graph.Edge e = graph.getConnection(v, u);
             if (E.contains(e)) {
